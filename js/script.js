@@ -51,6 +51,38 @@ const makeGuess = function (guess) {
         message.innerText = "You've already used this letter. Try again!"
     } else {
         guessedLetters.push(guess);
-        console.log(guessedLetters);
+        showGuessed();
+    }
+    updateWord(guessedLetters);
+};
+
+const showGuessed = function () {
+    guessedDisplay.innerHTML = "";
+    for (const letter of guessedLetters) {
+        let li = document.createElement("li");
+        li.innerText = letter;
+        guessedDisplay.append(li);
+    }
+};
+
+const updateWord = function (guessedLetters) {
+    const wordUpper = word.toUpperCase();
+    const wordArray = wordUpper.split("");
+    const wordInProgress = [];
+    for (const letter of wordArray) {
+        if (guessedLetters.includes(letter)) {
+            wordInProgress.push(letter);
+        } else {
+            wordInProgress.push("●");
+        }
+    };
+    scaffold.innerText = wordInProgress.join("");
+    winCheck();
+};
+
+const winCheck = function () {
+    if (scaffold.innerText == word.toUpperCase()) {
+        message.classList.add("win");
+        message.innerText = "You've guessed the word. Well done.";
     }
 };
