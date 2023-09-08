@@ -7,8 +7,22 @@ const numRemaining = document.querySelector("span");
 const message = document.querySelector(".message");
 const playAgain = document.querySelector(".play-again");
 
-const word = "magnolia";
+let word = "magnolia";
 const guessedLetters = [];
+let remainingGuesses = 8;
+
+const getWord = async function() {
+    const wordList = await fetch(
+        "https://gist.githubusercontent.com/skillcrush-curriculum/7061f1d4d3d5bfe47efbfbcfe42bf57e/raw/5ffc447694486e7dea686f34a6c085ae371b43fe/words.txt"
+    );
+    const list = await wordList.text();
+    const wordArray = list.split("\n");
+    const randomWord = Math.floor(Math.random() * wordArray.length);
+    word = wordArray[randomWord].trim();
+    setup(word);
+};
+
+getWord();
 
 const setup = function (word) {
     const dots = [];
@@ -18,8 +32,6 @@ const setup = function (word) {
     }
     scaffold.innerText = dots.join("");
 };
-
-setup(word);
 
 guessButton.addEventListener("click", function (e) {
     e.preventDefault();
@@ -52,6 +64,7 @@ const makeGuess = function (guess) {
     } else {
         guessedLetters.push(guess);
         showGuessed();
+        countRemainingGuesses(guess);
     }
     updateWord(guessedLetters);
 };
@@ -79,6 +92,24 @@ const updateWord = function (guessedLetters) {
     scaffold.innerText = wordInProgress.join("");
     winCheck();
 };
+
+const countRemainingGuesses = function(guess) {
+    let capWord = word.toUpperCase();
+    if (capWord.includes(guess)) {
+        message.innerText = "You got a letter. Good job, kid.";
+    } else {
+        message.innerText = "Not that letter. Try again!";
+        remainingGuesses--;
+    }
+    if (remainingGuesses == 0) {
+        message.innerText = `You've lost. The word was ${word}.`;
+        numRemaining.innerText = "no guesses";
+    } else if (remainingGuesses == 1) {
+        numRemaining.innerText = "1 guess";
+    } else {
+        numRemaining.innerText = `${remainingGuesses} guesses`;
+    }
+}
 
 const winCheck = function () {
     if (scaffold.innerText == word.toUpperCase()) {
